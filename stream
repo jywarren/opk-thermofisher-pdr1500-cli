@@ -1,0 +1,91 @@
+#!/usr/bin/env node
+
+// http://www.geotechenv.com/Manuals/Thermo_Scientific_Manuals/thermo_pdr-1500_manual.pdf
+
+var program = require('commander');
+var serialport = require("serialport");
+var SerialPort = serialport.SerialPort; // localize object constructor
+
+// set up CLI flags
+// Later, maybe add: "Detect the path by running the detect command."
+program
+  .version('0.0.1')
+  .option('-p, --path <path>', "Set a path to the Shinyei device's Arduino-based USB interface, default /dev/ttyUSB0", '/dev/ttyUSB0')
+  .option('-b, --baudrate <rate>', "Set a baudrate for the serial interface, default 19200", 19200)
+  .option('--buffer <size>', "Set a buffer size for the serial interface, default 255", 255)
+  .option('-c, --command <cmd>', "Enter a command to send over te serial interface")
+  .option('-v, --verbose', 'Turn on verbose mode')
+  .option('-i, --interval', 'Set an interval to sample at')
+  .option('-j, --json', 'Return JSON output')
+  .parse(process.argv);
+
+var log = function(msg) {
+  if (program.verbose) {
+    console.log(msg);
+  }
+}
+
+var serialPort = new SerialPort(program.path, {
+  baudrate:     program.baudrate,
+  parser:       serialport.parsers.readline()
+
+// none of these need to be set, but this is 
+// how they're specified by ThermoFisher:
+
+/*
+  parity:       'none',
+  dataBits:     8, // Bits per character
+  stopBits:     1, // The number of stop bit-times.
+  flowControl:  false,
+  bufferSize:   program.bufferSize,
+*/
+
+});
+
+if (program.verbose) {
+  serialport.list(function (err, ports) {
+    ports.forEach(function(port) {
+      log(port.comName,port.manufacturer,port.pnpId);
+    });
+  });
+}
+
+serialPort.on("open", function () {
+  log('open');
+
+  serialPort.on('data', function(data) {
+    data = ""+data;
+    var cmd = data.split('  ')[0];
+    log(cmd);
+    if (cmd == ">OUTPUT") {
+      var output = data.split('>OUTPUT  ')[1];
+      if (program.json) {
+        output = output.split(' ' );
+        output = {
+          'concentrationugm':        parseFloat(output[0]),
+          'temperaturec':            parseFloat(output[1]),
+          'relativehumiditypercent': parseInt(output[2]),
+          'pressuremmhg':            parseInt(output[3])
+        }
+        console.log(JSON.stringify(output));
+      } else {
+        console.log(output);
+      }
+    } else {
+      //log(data);
+    }
+  });
+
+  serialPort.write("SD off\r"); // Streaming display off
+  serialPort.write("RH off\r"); // Relative humidity display off
+  serialPort.write("UNITS 0\r"); // Concentration, not scattering
+
+  setInterval(function() {
+    serialPort.write("OUTPUT\r");
+  }, program.interval*1000);
+
+  serialPort.on("error", function(string) {
+    console.warn(string);
+  });
+
+});
