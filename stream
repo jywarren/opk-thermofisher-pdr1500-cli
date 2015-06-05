@@ -15,7 +15,7 @@ program
   .option('--buffer <size>', "Set a buffer size for the serial interface, default 255", 255)
   .option('-c, --command <cmd>', "Enter a command to send over te serial interface")
   .option('-v, --verbose', 'Turn on verbose mode')
-  .option('-i, --interval', 'Set an interval to sample at')
+  .option('-i, --interval <seconds>', 'Set an interval to sample at, default 30 seconds', 30)
   .option('-j, --json', 'Return JSON output')
   .parse(process.argv);
 
