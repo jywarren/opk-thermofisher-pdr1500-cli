@@ -1,0 +1,30 @@
+#!/usr/bin/env node
+
+var program = require('commander');
+var serialport = require('serialport');
+
+// set up CLI flags
+// Later, maybe add: "Detect the path by running the detect command."
+program
+  .version('0.0.1')
+  .option('-p, --path <path>', "Set a path to the Shinyei device's Arduino-based USB interface, default /dev/ttyACM0", '/dev/ttyACM0')
+  .option('-i, --interval <milliseconds>', 'Set a detection interval; how often, in milliseconds, to read high or low from the Shinyei; default 1', 1)
+  .option('-s, --summing <seconds>', 'Set a summing interval; how often, in seconds, to sum highs and lows and report a percentage; default 30', 30)
+  .option('-1, --pin1 <pin>', "Set a digital pin # for the Arduino to communicate with the Shinyei device's P1 sensor; default pin 8", 8)
+  .option('-2, --pin2 <pin>', "Set a digital pin # for the Arduino to communicate with the Shinyei device's P2 sensor; default pin 9", 9)
+  .option('-v, --verbose', 'Turn on verbose mode')
+  .option('-j, --json', 'Return JSON output')
+  .parse(process.argv);
+
+var log = function(msg) {
+  if (program.verbose) {
+    console.log(msg);
+  }
+}
+
+var SerialPort = require("serialport").SerialPort
+var serialPort = new SerialPort("/dev/tty-usbserial1", {
+  baudrate: 57600
+});
+
+
