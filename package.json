@@ -1,7 +1,7 @@
 {
-  "name": "opk-shinyei-ppd42-cli",
+  "name": "opk-thermofisher-pdr1500-cli",
   "version": "0.0.1",
-  "description": "An Open Pipe Kit command line interface for interacting with the Shinyei PPD42 optical dust sensor",
+  "description": "An Open Pipe Kit command line interface for interacting with the ThermoFisher pDR-1500 optical dust sensor over USB",
   "main": "stream",
   "dependencies": {
     "serialport":   "1.7.4",
