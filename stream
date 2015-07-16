@@ -10,7 +10,7 @@ var SerialPort = serialport.SerialPort; // localize object constructor
 // Later, maybe add: "Detect the path by running the detect command."
 program
   .version('0.0.1')
-  .option('-p, --path <path>', "Set a path to the Shinyei device's Arduino-based USB interface, default /dev/ttyUSB0", '/dev/ttyUSB0')
+  .option('-p, --path <path>', "Set a path to the ThermoFisher device's USB interface, default /dev/ttyUSB0", '/dev/ttyUSB0')
   .option('-b, --baudrate <rate>', "Set a baudrate for the serial interface, default 19200", 19200)
   .option('--buffer <size>', "Set a buffer size for the serial interface, default 255", 255)
   .option('-c, --command <cmd>', "Enter a command to send over te serial interface")
